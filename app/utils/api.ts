@@ -21,6 +21,7 @@ export async function sendChatMessage(message: string) {
         const data = await response.json();
 
         if (!response.ok) {
+            // Throw the error message received from the backend
             throw new ChatError(
                 data.error || 'Failed to send message',
                 response.status
@@ -33,10 +34,12 @@ export async function sendChatMessage(message: string) {
             throw error;
         }
 
+        // More specific network error handling
         if (error instanceof TypeError && error.message === 'Failed to fetch') {
             throw new ChatError('Network error. Please check your connection.', 503);
         }
 
+        // Re-throw other errors as a generic ChatError
         throw new ChatError('An unexpected error occurred', 500);
     }
 }

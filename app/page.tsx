@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Message, ChatResponse } from './types/chat';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Message } from './types/chat';
 import { formatErrorMessage } from './lib/utils';
 import ChatMessage from './components/ChatMessage';
 import ChatInput from './components/ChatInput';
 import LoadingDots from './components/LoadingDots';
 import ErrorMessage from './components/ErrorMessage';
+import { sendChatMessage } from './utils/api';
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -18,7 +19,7 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSendMessage = async (text: string) => {
+  const handleSendMessage = useCallback(async (text: string) => {
     if (!text.trim()) return;
 
     setError(null);
@@ -34,19 +35,7 @@ export default function ChatPage() {
     setMessages(prev => [...prev, userMessage]);
 
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: text }),
-      });
-
-      const data = await response.json() as ChatResponse;
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to send message');
-      }
+      const data = await sendChatMessage(text);
 
       const botMessage: Message = {
         id: crypto.randomUUID(),
@@ -57,24 +46,13 @@ export default function ChatPage() {
 
       setMessages(prev => [...prev, botMessage]);
 
-    } catch (error) {
-      console.error('Chat error:', error);
-      const errorText = formatErrorMessage(error);
-
-      setError(errorText);
-
-      const botErrorMessage: Message = {
-        id: crypto.randomUUID(),
-        text: `Error: ${errorText}`,
-        sender: 'bot',
-        timestamp: new Date(),
-      };
-
-      setMessages(prev => [...prev, botErrorMessage]);
+    } catch (err: any) { // Type the error as any or Error
+      console.error('Chat error:', err);
+      setError(formatErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   return (
     <main className="flex flex-col items-center justify-start min-h-screen bg-gray-50 p-4 md:p-8">

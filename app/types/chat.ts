@@ -7,5 +7,5 @@ export interface Message {
 
 export interface ChatResponse {
     message: string;
-    status: 'success' | 'error';
+    status?: 'success' | 'error'; // Backend might not always send status
 }

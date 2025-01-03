@@ -8,8 +8,8 @@ export default function ChatMessage({ message }: ChatMessageProps) {
     return (
         <div
             className={`mb-4 p-3 rounded-lg max-w-[80%] ${message.sender === 'user'
-                    ? 'ml-auto bg-blue-500 text-white'
-                    : 'mr-auto bg-gray-100 text-gray-800'
+                ? 'ml-auto bg-blue-500 text-white'
+                : 'mr-auto bg-gray-100 text-gray-800'
                 }`}
         >
             <p className="break-words">{message.text}</p>
