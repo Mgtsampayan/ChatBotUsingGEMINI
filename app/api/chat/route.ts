@@ -56,10 +56,10 @@ export async function POST(request: NextRequest) {
             message: result.response.text(),
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('API Error:', error);
 
-        if (error?.message?.includes('API key')) {
+        if (error instanceof Error && error.message.includes('API key')) {
             return NextResponse.json(
                 {
                     status: 'error',
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (error?.message?.includes('Rate limit')) {
+        if (error instanceof Error && error.message.includes('Rate limit')) {
             return NextResponse.json(
                 {
                     status: 'error',

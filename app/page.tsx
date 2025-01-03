@@ -46,7 +46,7 @@ export default function ChatPage() {
 
       setMessages(prev => [...prev, botMessage]);
 
-    } catch (err: any) { // Type the error as any or Error
+    } catch (err: Error | unknown) {
       console.error('Chat error:', err);
       setError(formatErrorMessage(err));
     } finally {
